@@ -71,7 +71,8 @@ class ChartWidget(pg.PlotWidget):
         Add plot area.
         """
         # Create plot object
-        plot: pg.PlotItem = pg.PlotItem(axisItems={"bottom": self._get_new_x_axis()})
+        plot: pg.PlotItem = pg.PlotItem(
+            axisItems={"bottom": self._get_new_x_axis()})
         plot.setMenuEnabled(False)
         plot.setClipToView(True)
         plot.hideAxis("left")
@@ -93,6 +94,7 @@ class ChartWidget(pg.PlotWidget):
         # Connect view change signal to update y range function
         view: pg.ViewBox = plot.getViewBox()
         view.sigXRangeChanged.connect(self._update_y_range)
+        view.sigYRangeChanged.connect(self._y_range_changed)
         view.setMouseEnabled(x=True, y=False)
 
         # Set right axis
@@ -111,6 +113,18 @@ class ChartWidget(pg.PlotWidget):
         # Add plot onto the layout
         self._layout.nextRow()
         self._layout.addItem(plot)
+
+    def _y_range_changed(self, vb):
+        changed_plot = None
+        for plot in self._plots.values():
+            if plot.getViewBox() == vb:
+                changed_plot = plot
+        if not changed_plot:
+            raise Exception('dangled viewbox', vb)
+
+        for item, plot in self._item_plot_map.items():
+            if changed_plot == plot:
+                item.y_range_changed()
 
     def add_item(
         self,
@@ -346,8 +360,10 @@ class ChartCursor(QtCore.QObject):
         pen: QtGui.QPen = pg.mkPen(WHITE_COLOR)
 
         for plot_name, plot in self._plots.items():
-            v_line: pg.InfiniteLine = pg.InfiniteLine(angle=90, movable=False, pen=pen)
-            h_line: pg.InfiniteLine = pg.InfiniteLine(angle=0, movable=False, pen=pen)
+            v_line: pg.InfiniteLine = pg.InfiniteLine(
+                angle=90, movable=False, pen=pen)
+            h_line: pg.InfiniteLine = pg.InfiniteLine(
+                angle=0, movable=False, pen=pen)
             view: pg.ViewBox = plot.getViewBox()
 
             for line in [v_line, h_line]:

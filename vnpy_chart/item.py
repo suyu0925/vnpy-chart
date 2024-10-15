@@ -50,6 +50,7 @@ class ChartItem(pg.GraphicsObject):
 
         # Force update during the next paint
         self._to_update: bool = False
+        self._to_repaint: bool = False
 
     @abstractmethod
     def _draw_bar_picture(self, ix: int, bar: BarData) -> QtGui.QPicture:
@@ -79,6 +80,9 @@ class ChartItem(pg.GraphicsObject):
         """
         Get information text to show by cursor.
         """
+        pass
+
+    def y_range_changed(self):
         pass
 
     def update_history(self, history: List[BarData]) -> None:
@@ -150,12 +154,14 @@ class ChartItem(pg.GraphicsObject):
         for ix in range(min_ix, max_ix):
             bar_picture: QtGui.QPicture = self._bar_pictures[ix]
 
-            if bar_picture is None:
+            if bar_picture is None or self._to_repaint:
                 bar: BarData = self._manager.get_bar(ix)
                 bar_picture = self._draw_bar_picture(ix, bar)
                 self._bar_pictures[ix] = bar_picture
 
             bar_picture.play(painter)
+
+        self._to_repaint = False
 
         painter.end()
 
@@ -391,6 +397,9 @@ class IconItem(ChartItem):
 
         painter.end()
         return candle_picture
+
+    def y_range_changed(self):
+        self._to_repaint = True
 
     def get_pixmap(self, icon: IconEnum) -> QtGui.QPixmap:
         if not icon.value in self._pixmaps:
