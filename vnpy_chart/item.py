@@ -10,6 +10,13 @@ from .base import BLACK_COLOR, UP_COLOR, DOWN_COLOR, PEN_WIDTH, BAR_WIDTH
 from .manager import BarManager
 
 
+def format_decimal(number, decimal_places=2):
+    formatted_number = f'{number:.{decimal_places}f}'
+    if formatted_number.endswith('0' * decimal_places):
+        return str(int(number))
+    return formatted_number
+
+
 class ChartItem(pg.GraphicsObject):
     """"""
 
@@ -241,16 +248,16 @@ class CandleItem(ChartItem):
                 bar.datetime.strftime("%H:%M"),
                 "",
                 "Open",
-                str(bar.open_price),
+                format_decimal(bar.open_price),
                 "",
                 "High",
-                str(bar.high_price),
+                format_decimal(bar.high_price),
                 "",
                 "Low",
-                str(bar.low_price),
+                format_decimal(bar.low_price),
                 "",
                 "Close",
-                str(bar.close_price)
+                format_decimal(bar.close_price)
             ]
             text: str = "\n".join(words)
         else:
