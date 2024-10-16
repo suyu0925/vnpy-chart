@@ -94,7 +94,6 @@ class ChartWidget(pg.PlotWidget):
         # Connect view change signal to update y range function
         view: pg.ViewBox = plot.getViewBox()
         view.sigXRangeChanged.connect(self._update_y_range)
-        view.sigYRangeChanged.connect(self._y_range_changed)
         view.setMouseEnabled(x=True, y=False)
 
         # Set right axis
@@ -114,18 +113,6 @@ class ChartWidget(pg.PlotWidget):
         self._layout.nextRow()
         self._layout.addItem(plot)
 
-    def _y_range_changed(self, vb):
-        changed_plot = None
-        for plot in self._plots.values():
-            if plot.getViewBox() == vb:
-                changed_plot = plot
-        if not changed_plot:
-            raise Exception('dangled viewbox', vb)
-
-        for item, plot in self._item_plot_map.items():
-            if changed_plot == plot:
-                item.y_range_changed()
-
     def add_item(
         self,
         item_class: Type[ChartItem],
@@ -140,6 +127,7 @@ class ChartWidget(pg.PlotWidget):
 
         plot: pg.PlotItem = self._plots.get(plot_name)
         plot.addItem(item)
+        item.be_added_to_parent()
 
         self._item_plot_map[item] = plot
 

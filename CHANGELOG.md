@@ -1,8 +1,12 @@
 # CHANGELOG
 
+## [0.0.4] - 2024-10-16
+
+- set the minimum display size for `IconItem`
+
 ## [0.0.3] - 2024-10-16
 
-- add assets/* to python package
+- add `assets/*` files to python package
 
 ## [0.0.2] - 2024-10-16
 

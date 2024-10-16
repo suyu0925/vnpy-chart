@@ -10,6 +10,8 @@ from ..manager import BarManager
 from .chart_item import ChartItem
 
 
+MIN_ICON_SIZE = 6
+
 ASSETS_FOLER = os.path.join(os.path.dirname(__file__), '../assets/')
 
 
@@ -25,6 +27,16 @@ class IconItem(ChartItem):
         super().__init__(manager)
 
         self._pixmaps = {}
+
+    def be_added_to_parent(self):
+        vb = self._get_client_viewbox()
+        vb.sigXRangeChanged.connect(self.set_to_repaint)
+        vb.sigYRangeChanged.connect(self.set_to_repaint)
+
+    def viewTransformChanged(self):
+        super().viewTransformChanged()
+        self.set_to_repaint()
+        self.update()
 
     def boundingRect(self) -> QtCore.QRectF:
         min_price, max_price = self._manager.get_price_range()
@@ -51,10 +63,10 @@ class IconItem(ChartItem):
             bar.extra or {}).get('icons') or []
         if len(icons) > 0:
             for icon, y in icons:
-                pixmap = self.get_pixmap(icon)
-                ratio = self.getAspectRatio()
-                client_ratio = self.getClientAspectRatio()
-                w = 1
+                pixmap = self._get_pixmap(icon)
+                ratio = self._get_aspect_ratio()
+                client_ratio = self._get_client_aspect_ratio()
+                w = self._get_icon_width()
                 h = w / ratio * client_ratio
                 rect: QtCore.QRectF = QtCore.QRectF(
                     ix - w/2,
@@ -67,10 +79,10 @@ class IconItem(ChartItem):
         painter.end()
         return picture
 
-    def y_range_changed(self):
+    def set_to_repaint(self):
         self._to_repaint = True
 
-    def get_pixmap(self, icon: IconEnum) -> QtGui.QPixmap:
+    def _get_pixmap(self, icon: IconEnum) -> QtGui.QPixmap:
         if not icon.value in self._pixmaps:
             pixmap = QtGui.QPixmap(os.path.join(ASSETS_FOLER, icon.value))
 
@@ -83,14 +95,28 @@ class IconItem(ChartItem):
             self._pixmaps[icon.value] = pixmap
         return self._pixmaps[icon.value]
 
-    def getClientAspectRatio(self) -> float:
+    def _get_client_viewbox(self) -> pg.ViewBox:
         parent = self.parentItem()
         while parent is not None:
             if isinstance(parent, pg.ViewBox):
-                return parent.width() / parent.height()
+                return parent
             parent = parent.parentItem()
         raise Exception('IconItem is not in any ViewBox')
 
-    def getAspectRatio(self) -> float:
+    def _get_client_width(self) -> float:
+        vb = self._get_client_viewbox()
+        return vb.width()
+
+    def _get_client_aspect_ratio(self) -> float:
+        vb = self._get_client_viewbox()
+        return vb.width() / vb.height()
+
+    def _get_aspect_ratio(self) -> float:
         view_rect = self.viewRect()
         return view_rect.width() / view_rect.height()
+
+    def _get_icon_width(self) -> float:
+        client_width = self._get_client_width()
+        if client_width / len(self._bar_pictures) < MIN_ICON_SIZE:
+            return MIN_ICON_SIZE / (client_width / len(self._bar_pictures))
+        return 1

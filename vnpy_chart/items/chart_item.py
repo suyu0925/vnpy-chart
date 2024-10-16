@@ -72,7 +72,7 @@ class ChartItem(pg.GraphicsObject):
         """
         pass
 
-    def y_range_changed(self):
+    def be_added_to_parent(self):
         pass
 
     def update_history(self, history: List[BarData]) -> None:
