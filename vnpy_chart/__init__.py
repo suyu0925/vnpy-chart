@@ -29,4 +29,4 @@ def mark_icon(bar, icon: tuple[IconEnum, float]):
     bar.extra['icons'].append(icon)
 
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
