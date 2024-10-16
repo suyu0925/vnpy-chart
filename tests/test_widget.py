@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-from vnpy_chart import ChartWidget, CandleItem, VolumeItem, IconItem
+from vnpy_chart import ChartWidget, CandleItem, VolumeItem, IconItem, LineItem
 from PySide6.QtWidgets import QApplication
 from tests.data import get_test_bars
 from tests.indicator import add_smiley_face_to_gloden_cross
@@ -19,6 +19,7 @@ class TestWidget(unittest.TestCase):
         self.widget.add_item(CandleItem, "candle", "candle")
         self.widget.add_item(VolumeItem, "volume", "volume")
         self.widget.add_item(IconItem, "icon", "candle")
+        self.widget.add_item(LineItem, "line", "candle")
         self.widget.add_cursor()
 
         bars = get_test_bars()

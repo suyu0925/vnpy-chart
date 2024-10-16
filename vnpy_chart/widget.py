@@ -12,7 +12,7 @@ from .base import (
     to_int, NORMAL_FONT
 )
 from .axis import DatetimeAxis
-from .item import ChartItem
+from .items import ChartItem
 
 
 pg.setConfigOptions(antialias=True)

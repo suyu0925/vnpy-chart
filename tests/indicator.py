@@ -1,5 +1,5 @@
 from vnpy.trader.object import BarData
-from vnpy_chart import IconEnum
+from vnpy_chart import IconEnum, LineColor, mark_line, mark_icon
 import numpy as np
 import pandas as pd
 
@@ -24,7 +24,7 @@ class ArrayManager(object):
         self.size: int = size
         self.inited: bool = False
 
-        self.close_array: np.ndarray = np.zeros(size)        
+        self.close_array: np.ndarray = np.zeros(size)
 
     def update_bar(self, bar: BarData) -> None:
         self.count += 1
@@ -52,13 +52,14 @@ def add_smiley_face_to_gloden_cross(bars: list[BarData]) -> list[BarData]:
 
         ma5 = MA(am.close, 5)
         ma20 = MA(am.close, 20)
-        if (CROSS(ma5, ma20)[-1]):
-            if bar.extra is None:
-                bar.extra = {}
 
+        mark_line(bar, ('ma5', ma5[-1], LineColor.YELLOW, 1))
+        mark_line(bar, ('ma20', ma20[-1], LineColor.GREEN))
+
+        if (CROSS(ma5, ma20)[-1]):
             if not 'icons' in bar.extra:
                 bar.extra['icons'] = []
 
-            bar.extra['icons'].append([IconEnum.SMILEY_FACE, ma5[-1]])
+            mark_icon(bar, (IconEnum.SMILEY_FACE, ma5[-1]))
 
     return bars
