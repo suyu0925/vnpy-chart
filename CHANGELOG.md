@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [0.0.5] - 2024-10-16
+
+- correctly set the size for `IconItem` when zooming in
+
 ## [0.0.4] - 2024-10-16
 
 - set the minimum display size for `IconItem`

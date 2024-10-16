@@ -10,7 +10,7 @@ from ..manager import BarManager
 from .chart_item import ChartItem
 
 
-MIN_ICON_SIZE = 6
+MIN_ICON_SIZE = 12
 
 ASSETS_FOLER = os.path.join(os.path.dirname(__file__), '../assets/')
 
@@ -43,7 +43,7 @@ class IconItem(ChartItem):
         rect: QtCore.QRectF = QtCore.QRectF(
             0,
             min_price,
-            len(self._bar_pictures),
+            self._manager.get_count(),
             max_price - min_price
         )
         return rect
@@ -95,6 +95,14 @@ class IconItem(ChartItem):
             self._pixmaps[icon.value] = pixmap
         return self._pixmaps[icon.value]
 
+    def _get_plot_item(self) -> pg.PlotItem:
+        parent = self.parentItem()
+        while parent is not None:
+            if isinstance(parent, pg.PlotItem):
+                return parent
+            parent = parent.parentItem()
+        raise Exception('IconItem is not in any PlotItem')
+
     def _get_client_viewbox(self) -> pg.ViewBox:
         parent = self.parentItem()
         while parent is not None:
@@ -115,8 +123,15 @@ class IconItem(ChartItem):
         view_rect = self.viewRect()
         return view_rect.width() / view_rect.height()
 
+    def _get_bar_count(self) -> int:
+        plot_item = self._get_plot_item()
+        vb = plot_item.getViewBox()
+        xrange = vb.viewRange()[0]
+        return xrange[1] - xrange[0]
+
     def _get_icon_width(self) -> float:
         client_width = self._get_client_width()
-        if client_width / len(self._bar_pictures) < MIN_ICON_SIZE:
-            return MIN_ICON_SIZE / (client_width / len(self._bar_pictures))
+        bar_count = self._get_bar_count()
+        if client_width / bar_count < MIN_ICON_SIZE:
+            return MIN_ICON_SIZE / (client_width / bar_count)
         return 1
