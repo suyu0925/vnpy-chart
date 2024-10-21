@@ -4,11 +4,21 @@ enhanced chart for vnpy
 
 ## tips
 
-If you encounter issues while installing [ta-lib](https://github.com/TA-Lib/ta-lib-python), try:
+### numpy
+
+use the last version of 1.x:
 
 ```sh
-pip install numpy==1.26.4 importlib_metadata
-pip install --extra-index-url https://pypi.vnpy.com TA_Lib==0.4.24
+pip install numpy==1.26.4 
+```
+
+### ta-lib
+
+If you encounter issues while installing [ta-lib](https://github.com/TA-Lib/ta-lib-python), try [talib-build](https://github.com/cgohlke/talib-build/releases):
+
+```sh
+wget https://github.com/cgohlke/talib-build/releases/download/v0.4.32/TA_Lib-0.4.32-cp312-cp312-win_amd64.whl -O TA_Lib-0.4.32-cp312-cp312-win_amd64.whl
+pip install TA_Lib-0.4.32-cp312-cp312-win_amd64.whl
 ```
 
 ## dev
@@ -25,7 +35,7 @@ python -m unittest discover -s tests
 1. install tools
 
 ```sh
-pip install --upgrade build twine
+pip install --upgrade importlib_metadata build twine
 ```
 
 2. build
